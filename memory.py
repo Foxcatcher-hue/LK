@@ -1,0 +1,137 @@
+html_content = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMORY顺序水滴效果</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000011;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .memory-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            justify-content: space-around;
+        }
+        
+        .memory-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20px;
+        }
+        
+        .memory-letter {
+            color: rgba(100, 255, 255, 0.9);
+            font-size: 10px;
+            opacity: 0;
+            text-shadow: 0 0 5px rgba(0, 200, 255, 0.7);
+            transition: opacity 1.5s ease-out;
+            margin: 3px 0;
+            height: 16px;
+            line-height: 16px;
+            will-change: opacity;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="memory-container" id="memoryContainer"></div>
+
+    <script>
+        const container = document.getElementById('memoryContainer');
+        const columns = Math.floor(window.innerWidth / 20);
+        const rows = Math.floor(window.innerHeight / 16);
+        const word = "MEMORY";
+        const wordLength = word.length;
+        
+        // 创建列和字母
+        for (let i = 0; i < columns; i++) {
+            const column = document.createElement('div');
+            column.className = 'memory-column';
+            
+            for (let j = 0; j < rows; j++) {
+                const letter = document.createElement('div');
+                letter.className = 'memory-letter';
+                // 初始为空
+                letter.textContent = '';
+                column.appendChild(letter);
+            }
+            
+            container.appendChild(column);
+        }
+        
+        // 水滴下滑动画函数（顺序字母版）
+        function playWaterDropAnimation() {
+            const allColumns = document.querySelectorAll('.memory-column');
+            
+            allColumns.forEach(column => {
+                // 随机决定是否激活这一列
+                if (Math.random() > 0.7) {
+                    const letters = column.querySelectorAll('.memory-letter');
+                    const totalLetters = letters.length;
+                    
+                    // 随机决定水滴长度（最短6个字母，最长全部字母）
+                    const dropLength = Math.max(6, Math.floor(Math.random() * totalLetters));
+                    
+                    // 随机决定起始位置（可以不是最顶部）
+                    const startPos = Math.floor(Math.random() * (totalLetters - dropLength));
+                    
+                    const animationDuration = 1000 + Math.random() * 1000;
+                    const startDelay = Math.random() * 800;
+                    const fadeDelay = 100 + Math.random() * 200;
+                    
+                    // 从上到下依次显示M-E-M-O-R-Y顺序
+                    Array.from(letters).slice(startPos, startPos + dropLength).forEach((letter, index) => {
+                        setTimeout(() => {
+                            // 按顺序显示M-E-M-O-R-Y循环
+                            const charIndex = index % wordLength;
+                            letter.textContent = word.charAt(charIndex);
+                            letter.style.opacity = '0.9';
+                            
+                            // 延迟后淡出
+                            setTimeout(() => {
+                                letter.style.opacity = '0';
+                            }, fadeDelay + index * 60);
+                        }, startDelay + index * 50);
+                    });
+                }
+            });
+        }
+        
+        // 初始动画延迟
+        setTimeout(() => {
+            // 首次动画
+            playWaterDropAnimation();
+            
+            // 设置循环动画
+            setInterval(() => {
+                playWaterDropAnimation();
+            }, 1000 + Math.random() * 600);
+        }, 500);
+        
+        // 窗口大小改变时重新布局
+        window.addEventListener('resize', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
+"""
+
+# 将HTML内容写入文件
+with open("memory_sequence_drop.html", "w", encoding="utf-8") as file:
+    file.write(html_content)
+
+print("HTML文件已生成: memory_sequence_drop.html")
